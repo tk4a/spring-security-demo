@@ -1,5 +1,6 @@
 package com.artem.springsecurity.config
 
+import com.artem.springsecurity.model.Permission
 import com.artem.springsecurity.model.Role
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -20,8 +21,8 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
         http
             ?.csrf()?.disable()
             ?.authorizeRequests()
-            ?.antMatchers(HttpMethod.GET,"/**")?.hasAnyRole(Role.ADMIN.name, Role.USER.name)
-            ?.antMatchers(HttpMethod.POST, "/**")?.hasRole(Role.ADMIN.name)
+            ?.antMatchers(HttpMethod.GET,"/**")?.hasAuthority(Permission.PERSON_READ.permission)
+            ?.antMatchers(HttpMethod.POST, "/**")?.hasAuthority(Permission.PERSON_WRITE.permission)
             ?.anyRequest()
             ?.authenticated()
             ?.and()
@@ -34,12 +35,12 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
             User.builder()
                 .username("admin")
                 .password(getPasswordEncoder().encode("admin"))
-                .roles(Role.ADMIN.name)
+                .authorities(Role.ADMIN.getAuthority())
                 .build(),
             User.builder()
                 .username("user")
                 .password(getPasswordEncoder().encode("user"))
-                .roles(Role.USER.name)
+                .authorities(Role.USER.getAuthority())
                 .build()
         )
     }
