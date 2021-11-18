@@ -4,6 +4,8 @@ import com.artem.springsecurity.model.Role
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -17,7 +19,14 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-class SecurityConfig : WebSecurityConfigurerAdapter() {
+class SecurityConfig(
+    private val userDetailsService: UserDetailsService
+) : WebSecurityConfigurerAdapter() {
+
+    override fun configure(auth: AuthenticationManagerBuilder?) {
+        auth
+            ?.authenticationProvider(daoAuthenticationProvider())
+    }
 
     override fun configure(http: HttpSecurity?) {
         http
@@ -56,4 +65,12 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
 
     @Bean
     fun getPasswordEncoder() = BCryptPasswordEncoder(12)
+
+    @Bean
+    protected fun daoAuthenticationProvider() = DaoAuthenticationProvider()
+        .apply {
+            this.setPasswordEncoder(getPasswordEncoder())
+            this.setUserDetailsService(userDetailsService)
+        }
+
 }

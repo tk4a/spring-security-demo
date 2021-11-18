@@ -3,10 +3,10 @@ package com.artem.springsecurity.model
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 
 enum class Role(
-    private val permission: Set<Permission>
+    private val permission: MutableSet<Permission>
 ) {
-    USER(setOf(Permission.PERSON_READ)),
-    ADMIN(setOf(
+    USER(mutableSetOf(Permission.PERSON_READ)),
+    ADMIN(mutableSetOf(
         Permission.PERSON_READ,
         Permission.PERSON_WRITE
     ));
